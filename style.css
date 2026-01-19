@@ -1,0 +1,114 @@
+
+body {
+font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+margin: 12px;
+}
+
+/* ---------- CONTROLS ---------- */
+
+.controls {
+display: flex;
+gap: 10px;
+margin-bottom: 10px;
+flex-wrap: wrap;
+}
+
+input {
+padding: 10px;
+font-size: 16px;
+font-weight: bold;
+border-radius: 8px;
+border: 1px solid #ccc;
+}
+
+/* ---------- BUTTONS ---------- */
+
+button {
+min-height: 48px;
+min-width: 48px;
+padding: 12px 18px;
+font-size: 16px;
+font-weight: 600;
+border-radius: 10px;
+border: none;
+color: #fff;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+-webkit-tap-highlight-color: transparent;
+}
+
+button:active {
+transform: scale(0.97);
+opacity: 0.9;
+}
+
+/* Button colors */
+.btn-build { background-color: #3498db; } /* blue */
+.btn-add { background-color: #2ecc71; } /* green */
+.btn-reset { background-color: #e74c3c; } /* red */
+
+/* ---------- WORD BOXES ---------- */
+
+#words {
+margin-bottom: 12px;
+}
+
+.word {
+display: flex;
+gap: 6px;
+margin-bottom: 6px;
+}
+
+.square {
+width: 44px;
+height: 44px;
+border: 2px solid #333;
+border-radius: 6px;
+}
+
+/* ---------- CANVAS ---------- */
+
+#canvas {
+position: relative;
+height: 350px;
+border: 2px dashed #aaa;
+border-radius: 8px;
+overflow: hidden;
+}
+
+/* ---------- LETTERS ---------- */
+
+.letter {
+position: absolute;
+width: 44px;
+height: 44px;
+border-radius: 6px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: bold;
+font-size: 20px;
+user-select: none;
+touch-action: none;
+background-color: #ddd;
+color: #000;
+}
+
+/* Vowels */
+.letter.vowel {
+background-color: #2ecc71;
+color: #000;
+}
+
+/* Consonants */
+.letter.consonant {
+background-color: #3498db;
+color: #fff;
+}
+
+/* Lock indicator (visual only, accepted limitation) */
+.letter.locked {
+outline: 3px solid gold;
+}
+

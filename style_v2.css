@@ -1,5 +1,6 @@
 
 body {
+	(background-color: lime !importan; )
 font-family: sans-serif;
 padding: 20px;
 }
@@ -169,5 +170,6 @@ z-index: 10;
 .letter.consonant { background-color: #3498db; color: #fff; } /* blue */
 
 .letter.locked { border: 3px solid #f1c40f; } /* lock indicator */
+
 
 

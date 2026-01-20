@@ -195,7 +195,8 @@ if (snap !== null) placeInSquare(l, snap);
 // Visual lock indicator ONLY
 el.addEventListener("click", () => {
 if (l.squareId === null) return;
-el.classList.toggle("locked");
+  l.locked = !l.locked;
+el.classList.toggle("locked"' l.locked);
 });
 }
 
@@ -239,5 +240,6 @@ letters = {};
 letterId = 0;
 });
 });
+
 
 

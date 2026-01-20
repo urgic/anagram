@@ -5,46 +5,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anagram Helper</title>
-
-<!-- Prevent aggressive caching during development -->
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="controls">
-<input
-id="wordInput"
-type="text"
-placeholder="Enter word lengths (e.g. 5 4)"
->
-
+<input id="wordInput" type="text" placeholder="Word lengths (e.g., 5 3 4)">
 <button id="buildBtn" class="btn-build">🧱 Build</button>
-</div>
-
-<div class="controls">
-<input
-id="letterInput"
-type="text"
-placeholder="Enter letters (e.g. TRAIN)"
->
-
+<br><br>
+<input id="letterInput" type="text" placeholder="Letters">
 <button id="addLetterBtn" class="btn-add">➕ Add</button>
 <button id="resetLettersBtn" class="btn-reset">🗑 Clear</button>
 </div>
 
-
-
 <div id="canvas">
-	<div id="words"></div>
+<div id="words"></div>
 </div>
 
-<script src="script.js?v=1"></script>
+<script src="script.js"></script>
 </body>
 </html>
-
-	
-

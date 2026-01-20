@@ -1,4 +1,4 @@
-alert("js loaded");
+alert{"JS Loaded");
 window.addEventListener("DOMContentLoaded", () => {
 const canvas = document.getElementById("canvas");
 const wordsContainer = document.getElementById("words");
@@ -56,14 +56,35 @@ letterInput.focus();
 }
 
 /* ---------- ADD LETTER ---------- */
-function addLetter(char) {
-const id = letterId++;
-const el = document.createElement("div");
-el.className = "letter";
-el.textContent = char;
+function addLetter(chars) {
+// Allow multiple letters
+for (let i = 0; i < chars.length; i++) {
+const char = chars[i];
+if (!char.match(/[a-zA-Z]/)) continue; // only letters
 
-if ("AEIOU".includes(char)) el.classList.add("vowel");
-else el.classList.add("consonant");
+const letterEl = document.createElement("div");
+letterEl.classList.add("letter");
+
+// Vowel / consonant coloring
+if ("AEIOUaeiou".includes(char)) {
+letterEl.classList.add("vowel"); // green
+} else {
+letterEl.classList.add("consonant"); // red
+}
+
+letterEl.textContent = char;
+
+// Initial position (random within canvas)
+letterEl.style.top = Math.random() * (canvas.clientHeight - 40) + "px";
+letterEl.style.left = Math.random() * (canvas.clientWidth - 40) + "px";
+
+// Append to canvas
+canvas.appendChild(letterEl);
+
+// Enable drag / interactions
+enableDrag(letterEl);
+}
+}
 
 const offset = (id % 10) * 18;
 
@@ -216,4 +237,4 @@ letterId = 0;
 });
 
 	
-
+e

@@ -1,14 +1,16 @@
 
+/* === Global styles === */
 body {
-	(background-color: lime !importan; )
 font-family: sans-serif;
 padding: 20px;
+margin: 0;
+background-color: #f9f9f9;
 }
 
 input {
 font-weight: bold;
-padding: 8px;
 font-size: 16px;
+padding: 8px;
 margin: 4px 0;
 }
 
@@ -37,6 +39,7 @@ transform: scale(0.97);
 opacity: 0.9;
 }
 
+/* === Canvas / word squares === */
 #canvas {
 position: relative;
 height: 350px;
@@ -60,6 +63,7 @@ border-radius: 4px;
 position: relative;
 }
 
+/* === Letters === */
 .letter {
 position: absolute;
 width: 44px;
@@ -79,7 +83,7 @@ font-size: 20px;
 .letter.consonant { color: #e74c3c; } /* red text */
 
 .letter.locked {
-border: 2px solid #f1c40f; /* subtle border highlight */
+border: 2px solid #f1c40f; /* subtle highlight */
 }
 
 .letter.locked::after {
@@ -92,84 +96,3 @@ pointer-events: none; /* doesn’t block drag */
 }
 
 	
-
-body {
-font-family: sans-serif;
-padding: 20px;
-}
-
-input {
-font-weight: bold;
-padding: 8px;
-font-size: 16px;
-margin: 4px 0;
-}
-
-.controls button {
-min-height: 48px;
-min-width: 48px;
-padding: 12px 18px;
-font-size: 16px;
-font-weight: 600;
-border-radius: 10px;
-border: none;
-color: #fff;
-display: inline-flex;
-align-items: center;
-gap: 8px;
-margin: 4px;
--webkit-tap-highlight-color: transparent;
-}
-
-.btn-build { background-color: #3498db; } /* blue */
-.btn-add { background-color: #2ecc71; } /* green */
-.btn-reset { background-color: #e74c3c; } /* red */
-
-button:active {
-transform: scale(0.97);
-opacity: 0.9;
-}
-
-#canvas {
-position: relative;
-height: 350px;
-border: 2px dashed #aaa;
-border-radius: 8px;
-margin-top: 20px;
-overflow: hidden;
-}
-
-.word {
-display: flex;
-margin-bottom: 10px;
-}
-
-.square {
-width: 44px;
-height: 44px;
-border: 2px solid #333;
-margin-right: 4px;
-border-radius: 4px;
-position: relative;
-}
-
-.letter {
-position: absolute;
-width: 44px;
-height: 44px;
-line-height: 44px;
-text-align: center;
-border-radius: 4px;
-background-color: #ccc;
-cursor: grab;
-user-select: none;
-z-index: 10;
-}
-
-.letter.vowel { background-color: #2ecc71; color: #000; } /* green */
-.letter.consonant { background-color: #3498db; color: #fff; } /* blue */
-
-.letter.locked { border: 3px solid #f1c40f; } /* lock indicator */
-
-
-

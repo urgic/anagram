@@ -1,4 +1,4 @@
-alert("JS loaded");
+
 // ==== Global references ====
 const canvas = document.getElementById("canvas");
 const numLettersInput = document.getElementById("numLetters");
@@ -161,3 +161,4 @@ letterEl.classList.remove("locked");
 }
 
 	
+

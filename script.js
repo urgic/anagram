@@ -161,6 +161,7 @@ clearTimeout(longPressTimer);
 if (l.squareId !== null) {
 squares[l.squareId].letterId = null;
 l.squareId = null;
+  l.locked = false;
 el.classList.remove("locked");
 }
 }
@@ -238,4 +239,5 @@ letters = {};
 letterId = 0;
 });
 });
+
 

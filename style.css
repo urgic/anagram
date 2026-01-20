@@ -7,6 +7,8 @@ margin: 12px;
 /* ---------- CONTROLS ---------- */
 
 .controls {
+  position: relative;
+  z-index: 100;
 display: flex;
 gap: 10px;
 margin-bottom: 10px;
@@ -74,6 +76,7 @@ border-radius: 6px;
 /* ---------- CANVAS ---------- */
 
 #canvas {
+  pointer=events: none;
 position: relative;
 height: 350px;
 border: 2px dashed #aaa;
@@ -84,6 +87,7 @@ overflow: hidden;
 /* ---------- LETTERS ---------- */
 
 .letter {
+  pointer-events: auto;
 position: absolute;
 z-index: 10;
 width: 44px;
@@ -116,6 +120,7 @@ color: #fff;
 .letter.locked {
 outline: 3px solid gold;
 }
+
 
 
 

@@ -76,7 +76,8 @@ id,
 el,
 left: 12 + offset,
 top: 12 + offset,
-squareId: null
+squareId: null,
+  locked: false
 };
 
 el.style.left = letters[id].left + "px";
@@ -138,6 +139,7 @@ let dragging = false;
 let longPressTimer;
 
 el.addEventListener("pointerdown", e => {
+  if (l.locked) return;
 dragging = false;
 
 longPressTimer = setTimeout(() => {
@@ -236,3 +238,4 @@ letters = {};
 letterId = 0;
 });
 });
+

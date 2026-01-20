@@ -61,6 +61,8 @@ margin-bottom: 6px;
 }
 
 .square {
+position: relative;
+z-index: 1;
 width: 44px;
 height: 44px;
 border: 2px solid #333;
@@ -71,6 +73,7 @@ border-radius: 6px;
 
 #canvas {
 position: relative;
+z-index: 0;
 height: 350px;
 border: 2px dashed #aaa;
 border-radius: 8px;
@@ -81,6 +84,7 @@ overflow: hidden;
 
 .letter {
 position: absolute;
+z-index: 10;
 width: 44px;
 height: 44px;
 border-radius: 6px;
@@ -111,4 +115,5 @@ color: #fff;
 .letter.locked {
 outline: 3px solid gold;
 }
+
 

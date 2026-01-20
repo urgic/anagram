@@ -21,7 +21,6 @@ wordsContainer.innerHTML = "";
 squares = {};
 squareId = 0;
 
-// Clear all letters
 for (const id in letters) {
 if (letters[id].el.parentElement) {
 canvas.removeChild(letters[id].el);
@@ -63,11 +62,8 @@ const el = document.createElement("div");
 el.className = "letter";
 el.textContent = char;
 
-if ("AEIOU".includes(char)) {
-el.classList.add("vowel");
-} else {
-el.classList.add("consonant");
-}
+if ("AEIOU".includes(char)) el.classList.add("vowel");
+else el.classList.add("consonant");
 
 const offset = (id % 10) * 18;
 
@@ -77,7 +73,7 @@ el,
 left: 12 + offset,
 top: 12 + offset,
 squareId: null,
-  locked: false
+locked: false
 };
 
 el.style.left = letters[id].left + "px";
@@ -108,16 +104,8 @@ const cy = letter.top + LETTER_SIZE / 2;
 for (const id in squares) {
 const sq = squares[id];
 if (sq.letterId !== null) continue;
-
 const r = sq.rect;
-if (
-cx > r.left &&
-cx < r.left + r.width &&
-cy > r.top &&
-cy < r.top + r.height
-) {
-return id;
-}
+if (cx > r.left && cx < r.left + r.width && cy > r.top && cy < r.top + r.height) return id;
 }
 return null;
 }
@@ -139,7 +127,6 @@ let dragging = false;
 let longPressTimer;
 
 el.addEventListener("pointerdown", e => {
-  
 dragging = false;
 
 longPressTimer = setTimeout(() => {
@@ -152,7 +139,7 @@ el.setPointerCapture(e.pointerId);
 });
 
 el.addEventListener("pointermove", e => {
-  if (l.locked) return;
+if (l.locked) return;
 if (!el.hasPointerCapture(e.pointerId)) return;
 
 if (!dragging) {
@@ -162,23 +149,14 @@ clearTimeout(longPressTimer);
 if (l.squareId !== null) {
 squares[l.squareId].letterId = null;
 l.squareId = null;
-  l.locked = false;
+l.locked = false;
 el.classList.remove("locked");
 }
 }
 
 const rect = canvas.getBoundingClientRect();
-
-l.left = Math.max(
-0,
-Math.min(l.left + e.movementX, rect.width - LETTER_SIZE)
-);
-
-l.top = Math.max(
-0,
-Math.min(l.top + e.movementY, rect.height - LETTER_SIZE)
-);
-
+l.left = Math.max(0, Math.min(l.left + e.movementX, rect.width - LETTER_SIZE));
+l.top = Math.max(0, Math.min(l.top + e.movementY, rect.height - LETTER_SIZE));
 el.style.left = l.left + "px";
 el.style.top = l.top + "px";
 });
@@ -193,11 +171,10 @@ if (snap !== null) placeInSquare(l, snap);
 }
 });
 
-// Visual lock indicator ONLY
 el.addEventListener("click", () => {
 if (l.squareId === null) return;
-  l.locked = !l.locked;
-el.classList.toggle("locked"' l.locked);
+l.locked = !l.locked;
+el.classList.toggle("locked", l.locked);
 });
 }
 
@@ -233,15 +210,11 @@ e.preventDefault();
 
 resetLettersBtn.addEventListener("click", () => {
 for (const id in letters) {
-if (letters[id].el.parentElement) {
-canvas.removeChild(letters[id].el);
-}
+if (letters[id].el.parentElement) canvas.removeChild(letters[id].el);
 }
 letters = {};
 letterId = 0;
 });
 });
 
-
-
-
+	

@@ -139,7 +139,7 @@ let dragging = false;
 let longPressTimer;
 
 el.addEventListener("pointerdown", e => {
-  if (l.locked) return;
+  
 dragging = false;
 
 longPressTimer = setTimeout(() => {
@@ -152,6 +152,7 @@ el.setPointerCapture(e.pointerId);
 });
 
 el.addEventListener("pointermove", e => {
+  if (l.locked) return;
 if (!el.hasPointerCapture(e.pointerId)) return;
 
 if (!dragging) {
@@ -240,6 +241,7 @@ letters = {};
 letterId = 0;
 });
 });
+
 
 
 

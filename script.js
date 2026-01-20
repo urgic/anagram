@@ -1,4 +1,4 @@
-
+alert("js loaded");
 window.addEventListener("DOMContentLoaded", () => {
 const canvas = document.getElementById("canvas");
 const wordsContainer = document.getElementById("words");
@@ -216,3 +216,4 @@ letterId = 0;
 });
 
 	
+

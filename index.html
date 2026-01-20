@@ -5,29 +5,33 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Anagram Helper</title>
+
+<!-- Link to CSS in root -->
 <link rel="stylesheet" href="./style_v3.css">
 </head>
 <body>
-<h1 stlyle="colot:red">Github Pages Loaeded</h1>
+<h1>Anagram Helper</h1>
+
+<!-- Controls -->
 <div class="controls">
-<input id="wordInput" type="text" placeholder="Word lengths (e.g., 5 3 4)">
-<button id="buildBtn" class="btn-build">🧱 Build</button>
-<br><br>
-<input id="letterInput" type="text" placeholder="Letters">
-<button id="addLetterBtn" class="btn-add">➕ Add</button>
-<button id="resetLettersBtn" class="btn-reset">🗑 Clear</button>
+<!-- Number of letters for build -->
+<input type="number" id="numLetters" min="1" placeholder="Number of letters">
+
+<!-- Letter input for add -->
+<input type="text" id="letterInput" placeholder="Enter letters">
+
+<!-- Buttons -->
+<button class="btn-build" id="buildBtn">Build</button>
+<button class="btn-add" id="addBtn">Add</button>
+<button class="btn-reset" id="resetBtn">Reset</button>
 </div>
 
-<div id="canvas">
-<div id="words"></div>
-</div>
+<!-- Canvas -->
+<div id="canvas"></div>
 
-<script src="./script_new.js"></script>
+<!-- Link to JS in root -->
+<script src="./script.js"></script>
 </body>
 </html>
 
-
-
-
-
-
+	

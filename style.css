@@ -52,7 +52,7 @@ opacity: 0.9;
 
 #words {
   position: relative;
-  z-index: 1;
+  /*z-index: 1;*/
   margin-bottom: 12px;
 }
 
@@ -75,7 +75,6 @@ border-radius: 6px;
 
 #canvas {
 position: relative;
-z-index: 10;
 height: 350px;
 border: 2px dashed #aaa;
 border-radius: 8px;
@@ -117,6 +116,7 @@ color: #fff;
 .letter.locked {
 outline: 3px solid gold;
 }
+
 
 
 

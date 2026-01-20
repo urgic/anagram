@@ -1,220 +1,93 @@
 
-window.addEventListener("DOMContentLoaded", () => {
-const canvas = document.getElementById("canvas");
-const wordsContainer = document.getElementById("words");
-const wordInput = document.getElementById("wordInput");
-const buildBtn = document.getElementById("buildBtn");
-const letterInput = document.getElementById("letterInput");
-const addLetterBtn = document.getElementById("addLetterBtn");
-const resetLettersBtn = document.getElementById("resetLettersBtn");
-
-const LETTER_SIZE = 44;
-
-let letters = {};
-let squares = {};
-let letterId = 0;
-let squareId = 0;
-
-/* ---------- BUILD WORD BOXES ---------- */
-function buildWords(lengths) {
-wordsContainer.innerHTML = "";
-squares = {};
-squareId = 0;
-
-for (const id in letters) {
-if (letters[id].el.parentElement) {
-canvas.removeChild(letters[id].el);
-}
-}
-letters = {};
-letterId = 0;
-
-lengths.forEach(len => {
-const word = document.createElement("div");
-word.className = "word";
-
-for (let i = 0; i < len; i++) {
-const sq = document.createElement("div");
-sq.className = "square";
-sq.dataset.id = squareId;
-
-squares[squareId] = {
-el: sq,
-rect: null,
-letterId: null
-};
-
-word.appendChild(sq);
-squareId++;
+body {
+font-family: sans-serif;
+padding: 20px;
 }
 
-wordsContainer.appendChild(word);
-});
-
-requestAnimationFrame(cacheSquareRects);
-letterInput.focus();
+input {
+font-weight: bold;
+padding: 8px;
+font-size: 16px;
+margin: 4px 0;
 }
 
-/* ---------- ADD LETTER ---------- */
-function addLetter(char) {
-const id = letterId++;
-const el = document.createElement("div");
-el.className = "letter";
-el.textContent = char;
-
-if ("AEIOU".includes(char)) el.classList.add("vowel");
-else el.classList.add("consonant");
-
-const offset = (id % 10) * 18;
-
-letters[id] = {
-id,
-el,
-left: 12 + offset,
-top: 12 + offset,
-squareId: null,
-locked: false
-};
-
-el.style.left = letters[id].left + "px";
-el.style.top = letters[id].top + "px";
-
-canvas.appendChild(el);
-enableDrag(id);
+.controls button {
+min-height: 48px;
+min-width: 48px;
+padding: 12px 18px;
+font-size: 16px;
+font-weight: 600;
+border-radius: 10px;
+border: none;
+color: #fff;
+display: inline-flex;
+align-items: center;
+gap: 8px;
+margin: 4px;
+-webkit-tap-highlight-color: transparent;
 }
 
-/* ---------- SQUARE METRICS ---------- */
-function cacheSquareRects() {
-const c = canvas.getBoundingClientRect();
-for (const id in squares) {
-const r = squares[id].el.getBoundingClientRect();
-squares[id].rect = {
-left: r.left - c.left,
-top: r.top - c.top,
-width: r.width,
-height: r.height
-};
-}
+.btn-build { background-color: #3498db; } /* blue */
+.btn-add { background-color: #2ecc71; } /* green */
+.btn-reset { background-color: #e74c3c; } /* red */
+
+button:active {
+transform: scale(0.97);
+opacity: 0.9;
 }
 
-function findSnapSquare(letter) {
-const cx = letter.left + LETTER_SIZE / 2;
-const cy = letter.top + LETTER_SIZE / 2;
-
-for (const id in squares) {
-const sq = squares[id];
-if (sq.letterId !== null) continue;
-const r = sq.rect;
-if (cx > r.left && cx < r.left + r.width && cy > r.top && cy < r.top + r.height) return id;
-}
-return null;
+#canvas {
+position: relative;
+height: 350px;
+border: 2px dashed #aaa;
+border-radius: 8px;
+margin-top: 20px;
+overflow: hidden;
 }
 
-function placeInSquare(letter, sid) {
-const r = squares[sid].rect;
-letter.left = r.left + r.width / 2 - LETTER_SIZE / 2;
-letter.top = r.top + r.height / 2 - LETTER_SIZE / 2;
-letter.squareId = sid;
-squares[sid].letterId = letter.id;
+.word {
+display: flex;
+margin-bottom: 10px;
 }
 
-/* ---------- DRAG / TAP / DELETE ---------- */
-function enableDrag(id) {
-const l = letters[id];
-const el = l.el;
-
-let dragging = false;
-let longPressTimer;
-
-el.addEventListener("pointerdown", e => {
-dragging = false;
-
-longPressTimer = setTimeout(() => {
-if (el.parentElement) canvas.removeChild(el);
-if (l.squareId !== null) squares[l.squareId].letterId = null;
-delete letters[id];
-}, 500);
-
-el.setPointerCapture(e.pointerId);
-});
-
-el.addEventListener("pointermove", e => {
-if (l.locked) return;
-if (!el.hasPointerCapture(e.pointerId)) return;
-
-if (!dragging) {
-dragging = true;
-clearTimeout(longPressTimer);
-
-if (l.squareId !== null) {
-squares[l.squareId].letterId = null;
-l.squareId = null;
-l.locked = false;
-el.classList.remove("locked");
-}
+.square {
+width: 44px;
+height: 44px;
+border: 2px solid #333;
+margin-right: 4px;
+border-radius: 4px;
+position: relative;
 }
 
-const rect = canvas.getBoundingClientRect();
-l.left = Math.max(0, Math.min(l.left + e.movementX, rect.width - LETTER_SIZE));
-l.top = Math.max(0, Math.min(l.top + e.movementY, rect.height - LETTER_SIZE));
-el.style.left = l.left + "px";
-el.style.top = l.top + "px";
-});
-
-el.addEventListener("pointerup", () => {
-clearTimeout(longPressTimer);
-
-if (dragging) {
-cacheSquareRects();
-const snap = findSnapSquare(l);
-if (snap !== null) placeInSquare(l, snap);
-}
-});
-
-el.addEventListener("click", () => {
-if (l.squareId === null) return;
-l.locked = !l.locked;
-el.classList.toggle("locked", l.locked);
-});
+.letter {
+position: absolute;
+width: 44px;
+height: 44px;
+line-height: 44px;
+text-align: center;
+border-radius: 4px;
+background-color: #ccc; /* neutral background */
+cursor: grab;
+user-select: none;
+z-index: 10;
+font-weight: bold;
+font-size: 20px;
 }
 
-/* ---------- UI EVENTS ---------- */
-buildBtn.addEventListener("click", () => {
-const lengths = wordInput.value
-.trim()
-.split(/\s+/)
-.map(n => parseInt(n, 10))
-.filter(n => n > 0);
+.letter.vowel { color: #2ecc71; } /* green text */
+.letter.consonant { color: #e74c3c; } /* red text */
 
-if (lengths.length) buildWords(lengths);
-});
-
-addLetterBtn.addEventListener("click", () => {
-const text = letterInput.value.toUpperCase().replace(/[^A-Z]/g, "");
-if (!text) return;
-for (const ch of text) addLetter(ch);
-letterInput.value = "";
-letterInput.focus();
-});
-
-letterInput.addEventListener("keydown", e => {
-if (e.key === "Enter") {
-const text = letterInput.value.toUpperCase().replace(/[^A-Z]/g, "");
-if (!text) return;
-for (const ch of text) addLetter(ch);
-letterInput.value = "";
-letterInput.focus();
-e.preventDefault();
+.letter.locked {
+border: 2px solid #f1c40f; /* subtle border highlight */
 }
-});
 
-resetLettersBtn.addEventListener("click", () => {
-for (const id in letters) {
-if (letters[id].el.parentElement) canvas.removeChild(letters[id].el);
+.letter.locked::after {
+content: "🔒"; /* lock icon overlay */
+position: absolute;
+top: 2px;
+right: 2px;
+font-size: 16px;
+pointer-events: none; /* doesn’t block drag */
 }
-letters = {};
-letterId = 0;
-});
-});
 
 	

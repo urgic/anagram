@@ -21,11 +21,22 @@ return;
 canvas.innerHTML = "";
 squares = [];
 
-// Create squares
+// Create squares horizontally
+const margin = 10;
+const squareSize = 50;
+const perRow = Math.floor(canvas.clientWidth / (squareSize + margin));
+
 for (let i = 0; i < num; i++) {
 const sq = document.createElement("div");
 sq.classList.add("square");
 sq.dataset.index = i;
+
+const row = Math.floor(i / perRow);
+const col = i % perRow;
+
+sq.style.top = row * (squareSize + margin) + "px";
+sq.style.left = col * (squareSize + margin) + "px";
+
 canvas.appendChild(sq);
 squares.push(sq);
 }
@@ -40,11 +51,9 @@ addLetter(chars);
 letterInput.value = ""; // clear input
 });
 
-// Allow Enter key in letter input
+// Enter key triggers Add
 letterInput.addEventListener("keydown", (e) => {
-if (e.key === "Enter") {
-addBtn.click();
-}
+if (e.key === "Enter") addBtn.click();
 });
 
 // ==== Reset canvas ====
@@ -56,29 +65,25 @@ squares = [];
 // ==== Add letters function ====
 function addLetter(chars) {
 for (let i = 0; i < chars.length; i++) {
-const char = chars[i].toUpercase();
-if (!char.match(/[a-zA-Z]/)) continue; // letters only
+let char = chars[i];
+if (!char.match(/[a-zA-Z]/)) continue; // only letters
+
+char = char.toUpperCase(); // force uppercase
 
 const letterEl = document.createElement("div");
 letterEl.classList.add("letter");
 
-// Vowel / consonant coloring
-if ("AEIOUaeiou".includes(char)) {
-letterEl.classList.add("vowel"); // green
-} else {
-letterEl.classList.add("consonant"); // red
-}
+// Coloring
+if ("AEIOU".includes(char)) letterEl.classList.add("vowel");
+else letterEl.classList.add("consonant");
 
 letterEl.textContent = char;
 
-// Random initial position inside canvas
-letterEl.style.top = Math.random() * (canvas.clientHeight - 40) + "px";
-letterEl.style.left = Math.random() * (canvas.clientWidth - 40) + "px";
+// Random offset inside canvas
+letterEl.style.top = 20 + Math.random() * (canvas.clientHeight - 70) + "px";
+letterEl.style.left = 20 + Math.random() * (canvas.clientWidth - 70) + "px";
 
-// Append to canvas
 canvas.appendChild(letterEl);
-
-// Enable dragging and interaction
 enableDrag(letterEl);
 }
 }
@@ -91,21 +96,16 @@ let isLocked = false;
 let longPressTimer = null;
 
 letterEl.addEventListener("pointerdown", (e) => {
-if (isLocked) return; // locked letters cannot move
-
+if (isLocked) return;
 letterEl.setPointerCapture(e.pointerId);
 offsetX = e.clientX - letterEl.offsetLeft;
 offsetY = e.clientY - letterEl.offsetTop;
 
-// Long press for delete (600ms)
-longPressTimer = setTimeout(() => {
-letterEl.remove();
-}, 600);
+longPressTimer = setTimeout(() => letterEl.remove(), 600);
 });
 
 letterEl.addEventListener("pointermove", (e) => {
 if (!letterEl.hasPointerCapture(e.pointerId)) return;
-
 clearTimeout(longPressTimer);
 
 letterEl.style.top = e.clientY - offsetY + "px";
@@ -116,7 +116,7 @@ letterEl.addEventListener("pointerup", (e) => {
 letterEl.releasePointerCapture(e.pointerId);
 clearTimeout(longPressTimer);
 
-// Snap to closest square if inside
+// Snap to square
 let snapped = false;
 for (let sq of squares) {
 const sqRect = sq.getBoundingClientRect();
@@ -128,38 +128,26 @@ letterRect.left + letterRect.width / 2 < sqRect.right &&
 letterRect.top + letterRect.height / 2 > sqRect.top &&
 letterRect.top + letterRect.height / 2 < sqRect.bottom
 ) {
-// Snap
 letterEl.style.top = sq.offsetTop + "px";
 letterEl.style.left = sq.offsetLeft + "px";
 currentSquare = sq;
-
-// Auto show lock indicator (but not locked yet)
-letterEl.classList.add("locked");
+letterEl.classList.add("locked"); // show lock indicator
 snapped = true;
 break;
 }
 }
-
 if (!snapped) {
-// Remove lock indicator if not in a square
 letterEl.classList.remove("locked");
 currentSquare = null;
 }
 });
 
-// Tap to toggle lock (only if in square)
-letterEl.addEventListener("click", (e) => {
+// Tap to toggle lock (only in square)
+letterEl.addEventListener("click", () => {
 if (!currentSquare) return;
 isLocked = !isLocked;
-
-if (isLocked) {
-letterEl.classList.add("locked");
-} else {
-letterEl.classList.remove("locked");
-}
+if (isLocked) letterEl.classList.add("locked");
+else letterEl.classList.remove("locked");
 });
 }
-
-	
-
 

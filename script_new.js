@@ -72,7 +72,12 @@ char = char.toUpperCase(); // force uppercase
 
 const letterEl = document.createElement("div");
 letterEl.classList.add("letter");
-
+letterEl.style.width = "50px";
+letterEl.style.height = "50px";
+letterEl.style.lineHeight = "50px";
+letterEl.style.fontSize = "24px";
+letterEl.style.fontWeight = "900px";
+letterEl.style.textAlign = "center";
 // Coloring
 if ("AEIOU".includes(char)) letterEl.classList.add("vowel");
 else letterEl.classList.add("consonant");
@@ -150,4 +155,5 @@ if (isLocked) letterEl.classList.add("locked");
 else letterEl.classList.remove("locked");
 });
 }
+
 

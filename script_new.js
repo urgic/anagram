@@ -1,4 +1,4 @@
-alert("Running");
+alert("JS Running");
 const canvas = document.getElementById("canvas");
 const numLettersInput = document.getElementById("numLetters");
 const letterInput = document.getElementById("letterInput");
@@ -7,28 +7,15 @@ const addBtn = document.getElementById("addBtn");
 const resetBtn = document.getElementById("resetBtn");
 
 const BOX = 50;
-const GAP = 8;
-const WORD_GAP = 24;
-const ROW_GAP = 14;
+const GAP = 10;
 
 let squares = [];
 
-/* ================= BUILD ================= */
-
+/* ===== BUILD ===== */
 buildBtn.addEventListener("click", () => {
-const raw = numLettersInput.value.trim();
-if (!raw) {
-alert("Enter numbers like: 3 5 4");
-return;
-}
-
-const words = raw
-.split(/[\s,]+/)
-.map(n => parseInt(n, 10))
-.filter(n => n > 0);
-
-if (!words.length) {
-alert("No valid numbers.");
+const num = parseInt(numLettersInput.value, 10);
+if (!num || num < 1) {
+alert("Enter a valid number");
 return;
 }
 
@@ -39,90 +26,79 @@ let x = 0;
 let y = 0;
 const maxWidth = canvas.clientWidth;
 
-for (const count of words) {
-const wordWidth = count * BOX + (count - 1) * GAP;
-
-if (x + wordWidth > maxWidth) {
+for (let i = 0; i < num; i++) {
+if (x + BOX > maxWidth) {
 x = 0;
-y += BOX + ROW_GAP;
+y += BOX + GAP;
 }
 
-for (let i = 0; i < count; i++) {
 const sq = document.createElement("div");
 sq.className = "square";
 sq.style.left = x + "px";
 sq.style.top = y + "px";
+
 canvas.appendChild(sq);
 squares.push(sq);
 
 x += BOX + GAP;
 }
-
-x += WORD_GAP;
-}
 });
 
-/* ================= ADD LETTERS ================= */
-
+/* ===== ADD LETTERS ===== */
 addBtn.addEventListener("click", () => {
 const text = letterInput.value.trim();
 if (!text) return;
-addLetters(text);
+
+for (const ch of text) {
+if (!/[a-z]/i.test(ch)) continue;
+
+const letter = document.createElement("div");
+letter.className = "letter";
+letter.textContent = ch.toUpperCase();
+
+letter.classList.add(
+"AEIOU".includes(letter.textContent) ? "vowel" : "consonant"
+);
+
+letter.style.left =
+Math.random() * (canvas.clientWidth - BOX) + "px";
+letter.style.top =
+Math.random() * (canvas.clientHeight - BOX) + "px";
+
+canvas.appendChild(letter);
+enableDrag(letter);
+}
+
 letterInput.value = "";
 });
 
-letterInput.addEventListener("keydown", e => {
-if (e.key === "Enter") addBtn.click();
+/* ===== RESET ===== */
+resetBtn.addEventListener("click", () => {
+canvas.innerHTML = "";
+squares = [];
 });
 
-function addLetters(text) {
-for (const rawChar of text) {
-if (!/[a-z]/i.test(rawChar)) continue;
-
-const char = rawChar.toUpperCase();
-const el = document.createElement("div");
-el.className = "letter";
-el.textContent = char;
-
-el.classList.add(
-"AEIOU".includes(char) ? "vowel" : "consonant"
-);
-
-el.style.left = Math.random() * (canvas.clientWidth - BOX) + "px";
-el.style.top = Math.random() * (canvas.clientHeight - BOX) + "px";
-
-canvas.appendChild(el);
-enableDrag(el);
-}
-}
-
-/* ================= DRAG / SNAP / LOCK ================= */
-
+/* ===== DRAG / SNAP / LOCK ===== */
 function enableDrag(el) {
 let offsetX, offsetY;
 let currentSquare = null;
 let locked = false;
-let longPress;
 
 el.addEventListener("pointerdown", e => {
 if (locked) return;
-
 el.setPointerCapture(e.pointerId);
-const rect = canvas.getBoundingClientRect();
 
-offsetX = e.clientX - rect.left - el.offsetLeft;
-offsetY = e.clientY - rect.top - el.offsetTop;
-
-longPress = setTimeout(() => el.remove(), 600);
+const r = canvas.getBoundingClientRect();
+offsetX = e.clientX - r.left - el.offsetLeft;
+offsetY = e.clientY - r.top - el.offsetTop;
 });
 
 el.addEventListener("pointermove", e => {
 if (!el.hasPointerCapture(e.pointerId)) return;
-clearTimeout(longPress);
 
-const rect = canvas.getBoundingClientRect();
-let x = e.clientX - rect.left - offsetX;
-let y = e.clientY - rect.top - offsetY;
+const r = canvas.getBoundingClientRect();
+let x = e.clientX - r.left - offsetX;
+let y = e.clientY - r.top - offsetY;
 
 x = Math.max(0, Math.min(canvas.clientWidth - BOX, x));
 y = Math.max(0, Math.min(canvas.clientHeight - BOX, y));
@@ -133,7 +109,6 @@ el.style.top = y + "px";
 
 el.addEventListener("pointerup", e => {
 el.releasePointerCapture(e.pointerId);
-clearTimeout(longPress);
 
 let snapped = false;
 
@@ -162,14 +137,10 @@ el.classList.remove("locked");
 }
 });
 
-/* === TAP TO LOCK (ONLY IN SQUARE) === */
 el.addEventListener("click", () => {
 if (!currentSquare) return;
-
 locked = !locked;
 el.classList.toggle("locked", locked);
 });
 }
-
-	
 

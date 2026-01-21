@@ -47,6 +47,9 @@ border: 2px dashed #aaa;
 border-radius: 8px;
 margin-top: 20px;
 overflow: hidden;
+display: flex; /* use flex layout */
+flex-wrap: wrap; /* wrap to next line if needed */
+gap: 8px; /* space between squares */
 }
 
 .word {
@@ -55,29 +58,33 @@ margin-bottom: 10px;
 }
 
 .square {
-width: 44px;
-height: 44px;
+width: 50px; /* slightly bigger */
+height: 50px;
 border: 2px solid #333;
-margin-right: 4px;
-border-radius: 4px;
+border-radius: 6px;
 position: relative;
+display: flex;
+align-items: center;
+justify-content: center;
 }
 
 /* === Letters === */
 .letter {
 position: absolute;
-width: 44px;
-height: 44px;
-line-height: 44px;
+width: 50px;
+height: 50px;
+line-height: 50px;
 text-align: center;
-border-radius: 4px;
-background-color: #ccc; /* neutral background */
+font-weight: 900; /* extra bold */
+font-size: 24px; /* larger text */
+text-transform: uppercase; /* force uppercase */
+border-radius: 6px;
+background-color: #ccc;
 cursor: grab;
 user-select: none;
 z-index: 10;
-font-weight: bold;
-font-size: 20px;
 }
+ 
 
 .letter.vowel { color: #2ecc71; } /* green text */
 .letter.consonant { color: #e74c3c; } /* red text */

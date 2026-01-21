@@ -56,7 +56,7 @@ squares = [];
 // ==== Add letters function ====
 function addLetter(chars) {
 for (let i = 0; i < chars.length; i++) {
-const char = chars[i];
+const char = chars[i].toUpercase();
 if (!char.match(/[a-zA-Z]/)) continue; // letters only
 
 const letterEl = document.createElement("div");
@@ -161,4 +161,5 @@ letterEl.classList.remove("locked");
 }
 
 	
+
 

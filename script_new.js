@@ -1,4 +1,4 @@
-
+alert("Running");
 const canvas = document.getElementById("canvas");
 const numLettersInput = document.getElementById("numLetters");
 const letterInput = document.getElementById("letterInput");
@@ -172,3 +172,4 @@ el.classList.toggle("locked", locked);
 }
 
 	
+

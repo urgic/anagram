@@ -1,0 +1,479 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Anagram Helper</title>
+<style>
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+-webkit-tap-highlight-color: transparent;
+}
+
+body {
+font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+height: 100vh;
+display: flex;
+flex-direction: column;
+padding: 10px;
+touch-action: none;
+overflow: hidden;
+}
+
+.container {
+display: flex;
+flex-direction: column;
+height: 100%;
+background: white;
+border-radius: 12px;
+padding: 15px;
+box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+overflow: hidden;
+}
+
+h1 {
+text-align: center;
+color: #667eea;
+margin-bottom: 10px;
+font-size: 20px;
+}
+
+.inputs-container {
+display: flex;
+flex-direction: column;
+gap: 8px;
+margin-bottom: 10px;
+}
+
+.input-row {
+display: flex;
+gap: 8px;
+align-items: flex-end;
+}
+
+.input-group {
+flex: 1;
+display: flex;
+flex-direction: column;
+}
+
+label {
+margin-bottom: 3px;
+font-weight: 600;
+color: #333;
+font-size: 12px;
+}
+
+input {
+width: 100%;
+padding: 10px;
+border: 2px solid #ddd;
+border-radius: 6px;
+font-size: 14px;
+}
+
+input:focus {
+outline: none;
+border-color: #667eea;
+}
+
+button {
+padding: 10px 15px;
+background: #667eea;
+color: white;
+border: none;
+border-radius: 6px;
+font-size: 14px;
+font-weight: 600;
+cursor: pointer;
+transition: background 0.3s;
+white-space: nowrap;
+height: 42px;
+}
+
+button:active {
+background: #5568d3;
+}
+
+.word-boxes {
+min-height: 50px;
+padding: 10px;
+background: #f8f9fa;
+border-radius: 8px;
+margin-bottom: 10px;
+display: flex;
+flex-wrap: wrap;
+gap: 15px;
+align-items: flex-start;
+flex-shrink: 0;
+}
+
+.word-container {
+display: flex;
+gap: 4px;
+margin-bottom: 5px;
+}
+
+.letter-box {
+width: 35px;
+height: 45px;
+border: 2px solid #667eea;
+border-radius: 6px;
+background: white;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 20px;
+font-weight: bold;
+color: #667eea;
+cursor: pointer;
+transition: all 0.2s;
+}
+
+.letter-box.filled {
+background: #667eea;
+color: white;
+}
+
+.letter-box.filled.vowel {
+background: #e74c3c;
+}
+
+.letter-box.locked {
+background: #2ecc71;
+color: white;
+position: relative;
+}
+
+.letter-box.locked::after {
+content: '🔒';
+position: absolute;
+top: -8px;
+right: -8px;
+font-size: 12px;
+}
+
+#canvas {
+position: relative;
+flex: 1;
+background: #fefefe;
+border: 2px dashed #ddd;
+border-radius: 8px;
+touch-action: none;
+overflow: hidden;
+min-height: 0;
+}
+
+.letter-tile {
+position: absolute;
+width: 40px;
+height: 40px;
+background: linear-gradient(135deg, #667eea, #764ba2);
+color: white;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 22px;
+font-weight: bold;
+cursor: move;
+user-select: none;
+box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+touch-action: none;
+z-index: 1;
+transition: opacity 0.2s;
+}
+
+.letter-tile.vowel {
+background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.letter-tile.dragging {
+z-index: 1000;
+opacity: 0.8;
+transform: scale(1.1);
+}
+
+.letter-tile.placed {
+opacity: 0;
+pointer-events: none;
+}
+</style>
+</head>
+<body>
+<div class="container">
+<h1>🔤 Anagram Helper</h1>
+
+<div class="inputs-container">
+<div class="input-row">
+<div class="input-group">
+<label for="numbers">Word Lengths:</label>
+<input type="text" id="numbers" placeholder="e.g., 3, 5, 4">
+</div>
+<button onclick="createWordBoxes()">Create Boxes</button>
+</div>
+
+<div class="input-row">
+<div class="input-group">
+<label for="letters">Letters:</label>
+<input type="text" id="letters" placeholder="e.g., ABCDEFGHIJKL">
+</div>
+<button onclick="createLetterTiles()">Create Tiles</button>
+</div>
+</div>
+
+<div class="word-boxes" id="wordBoxes"></div>
+
+<div id="canvas"></div>
+</div>
+
+<script>
+let draggedElement = null;
+let offsetX = 0;
+let offsetY = 0;
+
+function createWordBoxes() {
+const input = document.getElementById('numbers').value;
+const numbers = input.split(/[\s,]+/).filter(n => n.trim()).map(n => parseInt(n.trim()));
+const container = document.getElementById('wordBoxes');
+
+container.innerHTML = '';
+clearLetters();
+
+if (numbers.length === 0) return;
+
+numbers.forEach((length, wordIndex) => {
+if (length > 0) {
+const wordContainer = document.createElement('div');
+wordContainer.className = 'word-container';
+wordContainer.dataset.wordIndex = wordIndex;
+
+for (let i = 0; i < length; i++) {
+const box = document.createElement('div');
+box.className = 'letter-box';
+box.dataset.position = i;
+box.dataset.wordIndex = wordIndex;
+box.onclick = handleBoxClick;
+wordContainer.appendChild(box);
+}
+
+container.appendChild(wordContainer);
+}
+});
+}
+
+function clearLetters() {
+document.getElementById('canvas').innerHTML = '';
+}
+
+function createLetterTiles() {
+const input = document.getElementById('letters').value.toUpperCase();
+const letters = input.replace(/[^A-Z]/g, '').split('');
+const canvas = document.getElementById('canvas');
+
+canvas.innerHTML = '';
+
+const canvasRect = canvas.getBoundingClientRect();
+const padding = 10;
+const tileSize = 40;
+const cols = Math.floor((canvasRect.width - padding * 2) / (tileSize + padding));
+
+letters.forEach((letter, index) => {
+const tile = document.createElement('div');
+tile.className = 'letter-tile';
+tile.textContent = letter;
+tile.dataset.letter = letter;
+tile.dataset.tileId = 'tile-' + Date.now() + '-' + index;
+
+// Color vowels red
+if ('AEIOU'.includes(letter)) {
+tile.classList.add('vowel');
+}
+
+const col = index % cols;
+const row = Math.floor(index / cols);
+const x = padding + col * (tileSize + padding);
+const y = padding + row * (tileSize + padding);
+
+tile.style.left = x + 'px';
+tile.style.top = y + 'px';
+tile.dataset.homeX = x;
+tile.dataset.homeY = y;
+
+tile.addEventListener('mousedown', startDrag);
+tile.addEventListener('touchstart', startDrag, { passive: false });
+
+canvas.appendChild(tile);
+});
+}
+
+function startDrag(e) {
+e.preventDefault();
+
+draggedElement = e.target;
+draggedElement.classList.add('dragging');
+
+const rect = draggedElement.getBoundingClientRect();
+
+if (e.type === 'touchstart') {
+const touch = e.touches[0];
+offsetX = touch.clientX - rect.left;
+offsetY = touch.clientY - rect.top;
+} else {
+offsetX = e.clientX - rect.left;
+offsetY = e.clientY - rect.top;
+}
+
+document.addEventListener('mousemove', drag);
+document.addEventListener('touchmove', drag, { passive: false });
+document.addEventListener('mouseup', endDrag);
+document.addEventListener('touchend', endDrag);
+}
+
+function drag(e) {
+if (!draggedElement) return;
+e.preventDefault();
+
+const canvas = document.getElementById('canvas');
+const canvasRect = canvas.getBoundingClientRect();
+
+let clientX, clientY;
+if (e.type === 'touchmove') {
+clientX = e.touches[0].clientX;
+clientY = e.touches[0].clientY;
+} else {
+clientX = e.clientX;
+clientY = e.clientY;
+}
+
+let x = clientX - canvasRect.left - offsetX;
+let y = clientY - canvasRect.top - offsetY;
+
+x = Math.max(0, Math.min(x, canvasRect.width - 40));
+y = Math.max(0, Math.min(y, canvasRect.height - 40));
+
+draggedElement.style.left = x + 'px';
+draggedElement.style.top = y + 'px';
+}
+
+function endDrag(e) {
+if (!draggedElement) return;
+
+draggedElement.classList.remove('dragging');
+
+let clientX, clientY;
+if (e.type === 'touchend') {
+if (e.changedTouches.length > 0) {
+clientX = e.changedTouches[0].clientX;
+clientY = e.changedTouches[0].clientY;
+} else {
+draggedElement = null;
+document.removeEventListener('mousemove', drag);
+document.removeEventListener('touchmove', drag);
+document.removeEventListener('mouseup', endDrag);
+document.removeEventListener('touchend', endDrag);
+return;
+}
+} else {
+clientX = e.clientX;
+clientY = e.clientY;
+}
+
+checkSnap(clientX, clientY);
+
+draggedElement = null;
+
+document.removeEventListener('mousemove', drag);
+document.removeEventListener('touchmove', drag);
+document.removeEventListener('mouseup', endDrag);
+document.removeEventListener('touchend', endDrag);
+}
+
+function checkSnap(clientX, clientY) {
+const boxes = document.querySelectorAll('.letter-box');
+let closestBox = null;
+let closestDistance = Infinity;
+
+boxes.forEach(box => {
+if (box.classList.contains('filled') || box.classList.contains('locked')) return;
+
+const rect = box.getBoundingClientRect();
+const centerX = rect.left + rect.width / 2;
+const centerY = rect.top + rect.height / 2;
+
+const distance = Math.sqrt(
+Math.pow(clientX - centerX, 2) + 
+Math.pow(clientY - centerY, 2)
+);
+
+if (distance < closestDistance && distance < 80) {
+closestDistance = distance;
+closestBox = box;
+}
+});
+
+if (closestBox) {
+closestBox.textContent = draggedElement.dataset.letter;
+closestBox.classList.add('filled');
+closestBox.dataset.tileId = draggedElement.dataset.tileId;
+
+// Keep vowel color in boxes
+if (draggedElement.classList.contains('vowel')) {
+closestBox.classList.add('vowel');
+}
+
+draggedElement.classList.add('placed');
+}
+}
+
+function handleBoxClick(e) {
+const box = e.target;
+if (!box.classList.contains('filled')) return;
+
+if (box.classList.contains('locked')) {
+box.classList.remove('locked');
+return;
+}
+
+const now = Date.now();
+const lastTap = parseInt(box.dataset.lastTap || 0);
+
+if (now - lastTap < 350) {
+box.classList.add('locked');
+delete box.dataset.lastTap;
+return;
+}
+
+box.dataset.lastTap = now.toString();
+
+setTimeout(() => {
+const currentLastTap = parseInt(box.dataset.lastTap || 0);
+if (currentLastTap === now && !box.classList.contains('locked')) {
+const tileId = box.dataset.tileId;
+const tiles = document.querySelectorAll('.letter-tile');
+
+tiles.forEach(tile => {
+if (tile.dataset.tileId === tileId) {
+tile.classList.remove('placed');
+tile.style.left = tile.dataset.homeX + 'px';
+tile.style.top = tile.dataset.homeY + 'px';
+}
+});
+
+box.textContent = '';
+box.classList.remove('filled');
+box.classList.remove('vowel');
+delete box.dataset.tileId;
+delete box.dataset.lastTap;
+}
+}, 350);
+}
+</script>
+</body>
+</html>
+
+	

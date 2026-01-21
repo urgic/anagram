@@ -1,5 +1,4 @@
 
-// ==== Global references ====
 const canvas = document.getElementById("canvas");
 const numLettersInput = document.getElementById("numLetters");
 const letterInput = document.getElementById("letterInput");
@@ -7,153 +6,169 @@ const buildBtn = document.getElementById("buildBtn");
 const addBtn = document.getElementById("addBtn");
 const resetBtn = document.getElementById("resetBtn");
 
-let squares = []; // Array of square elements
+const BOX = 50;
+const GAP = 8;
+const WORD_GAP = 24;
+const ROW_GAP = 14;
 
-// ==== Build squares ====
+let squares = [];
+
+/* ================= BUILD ================= */
+
 buildBtn.addEventListener("click", () => {
-const num = parseInt(numLettersInput.value);
-if (isNaN(num) || num < 1) {
-alert("Enter a valid number of letters.");
+const raw = numLettersInput.value.trim();
+if (!raw) {
+alert("Enter numbers like: 3 5 4");
 return;
 }
 
-// Clear previous squares and letters
+const words = raw
+.split(/[\s,]+/)
+.map(n => parseInt(n, 10))
+.filter(n => n > 0);
+
+if (!words.length) {
+alert("No valid numbers.");
+return;
+}
+
 canvas.innerHTML = "";
 squares = [];
 
-// Create squares horizontally
-const margin = 10;
-const squareSize = 50;
-const perRow = Math.floor(canvas.clientWidth / (squareSize + margin));
+let x = 0;
+let y = 0;
+const maxWidth = canvas.clientWidth;
 
-for (let i = 0; i < num; i++) {
+for (const count of words) {
+const wordWidth = count * BOX + (count - 1) * GAP;
+
+if (x + wordWidth > maxWidth) {
+x = 0;
+y += BOX + ROW_GAP;
+}
+
+for (let i = 0; i < count; i++) {
 const sq = document.createElement("div");
-sq.classList.add("square");
-sq.dataset.index = i;
-
-const row = Math.floor(i / perRow);
-const col = i % perRow;
-
-sq.style.top = row * (squareSize + margin) + "px";
-sq.style.left = col * (squareSize + margin) + "px";
-
+sq.className = "square";
+sq.style.left = x + "px";
+sq.style.top = y + "px";
 canvas.appendChild(sq);
 squares.push(sq);
+
+x += BOX + GAP;
+}
+
+x += WORD_GAP;
 }
 });
 
-// ==== Add letters ====
-addBtn.addEventListener("click", () => {
-const chars = letterInput.value.trim();
-if (!chars) return;
+/* ================= ADD LETTERS ================= */
 
-addLetter(chars);
-letterInput.value = ""; // clear input
+addBtn.addEventListener("click", () => {
+const text = letterInput.value.trim();
+if (!text) return;
+addLetters(text);
+letterInput.value = "";
 });
 
-// Enter key triggers Add
-letterInput.addEventListener("keydown", (e) => {
+letterInput.addEventListener("keydown", e => {
 if (e.key === "Enter") addBtn.click();
 });
 
-// ==== Reset canvas ====
-resetBtn.addEventListener("click", () => {
-canvas.innerHTML = "";
-squares = [];
-});
+function addLetters(text) {
+for (const rawChar of text) {
+if (!/[a-z]/i.test(rawChar)) continue;
 
-// ==== Add letters function ====
-function addLetter(chars) {
-for (let i = 0; i < chars.length; i++) {
-let char = chars[i];
-if (!char.match(/[a-zA-Z]/)) continue; // only letters
+const char = rawChar.toUpperCase();
+const el = document.createElement("div");
+el.className = "letter";
+el.textContent = char;
 
-char = char.toUpperCase(); // force uppercase
+el.classList.add(
+"AEIOU".includes(char) ? "vowel" : "consonant"
+);
 
-const letterEl = document.createElement("div");
-letterEl.classList.add("letter");
-letterEl.style.width = "50px";
-letterEl.style.height = "50px";
-letterEl.style.lineHeight = "50px";
-letterEl.style.fontSize = "24px";
-letterEl.style.fontWeight = "900px";
-letterEl.style.textAlign = "center";
-// Coloring
-if ("AEIOU".includes(char)) letterEl.classList.add("vowel");
-else letterEl.classList.add("consonant");
+el.style.left = Math.random() * (canvas.clientWidth - BOX) + "px";
+el.style.top = Math.random() * (canvas.clientHeight - BOX) + "px";
 
-letterEl.textContent = char;
-
-// Random offset inside canvas
-letterEl.style.top = 20 + Math.random() * (canvas.clientHeight - 70) + "px";
-letterEl.style.left = 20 + Math.random() * (canvas.clientWidth - 70) + "px";
-
-canvas.appendChild(letterEl);
-enableDrag(letterEl);
+canvas.appendChild(el);
+enableDrag(el);
 }
 }
 
-// ==== Drag / snap / lock / delete ====
-function enableDrag(letterEl) {
+/* ================= DRAG / SNAP / LOCK ================= */
+
+function enableDrag(el) {
 let offsetX, offsetY;
 let currentSquare = null;
-let isLocked = false;
-let longPressTimer = null;
+let locked = false;
+let longPress;
 
-letterEl.addEventListener("pointerdown", (e) => {
-if (isLocked) return;
-letterEl.setPointerCapture(e.pointerId);
-offsetX = e.clientX - letterEl.offsetLeft;
-offsetY = e.clientY - letterEl.offsetTop;
+el.addEventListener("pointerdown", e => {
+if (locked) return;
 
-longPressTimer = setTimeout(() => letterEl.remove(), 600);
+el.setPointerCapture(e.pointerId);
+const rect = canvas.getBoundingClientRect();
+
+offsetX = e.clientX - rect.left - el.offsetLeft;
+offsetY = e.clientY - rect.top - el.offsetTop;
+
+longPress = setTimeout(() => el.remove(), 600);
 });
 
-letterEl.addEventListener("pointermove", (e) => {
-if (!letterEl.hasPointerCapture(e.pointerId)) return;
-clearTimeout(longPressTimer);
+el.addEventListener("pointermove", e => {
+if (!el.hasPointerCapture(e.pointerId)) return;
+clearTimeout(longPress);
 
-letterEl.style.top = e.clientY - offsetY + "px";
-letterEl.style.left = e.clientX - offsetX + "px";
+const rect = canvas.getBoundingClientRect();
+let x = e.clientX - rect.left - offsetX;
+let y = e.clientY - rect.top - offsetY;
+
+x = Math.max(0, Math.min(canvas.clientWidth - BOX, x));
+y = Math.max(0, Math.min(canvas.clientHeight - BOX, y));
+
+el.style.left = x + "px";
+el.style.top = y + "px";
 });
 
-letterEl.addEventListener("pointerup", (e) => {
-letterEl.releasePointerCapture(e.pointerId);
-clearTimeout(longPressTimer);
+el.addEventListener("pointerup", e => {
+el.releasePointerCapture(e.pointerId);
+clearTimeout(longPress);
 
-// Snap to square
 let snapped = false;
-for (let sq of squares) {
-const sqRect = sq.getBoundingClientRect();
-const letterRect = letterEl.getBoundingClientRect();
+
+for (const sq of squares) {
+const s = sq.getBoundingClientRect();
+const l = el.getBoundingClientRect();
 
 if (
-letterRect.left + letterRect.width / 2 > sqRect.left &&
-letterRect.left + letterRect.width / 2 < sqRect.right &&
-letterRect.top + letterRect.height / 2 > sqRect.top &&
-letterRect.top + letterRect.height / 2 < sqRect.bottom
+l.left + l.width / 2 > s.left &&
+l.left + l.width / 2 < s.right &&
+l.top + l.height / 2 > s.top &&
+l.top + l.height / 2 < s.bottom
 ) {
-letterEl.style.top = sq.offsetTop + "px";
-letterEl.style.left = sq.offsetLeft + "px";
+el.style.left = sq.offsetLeft + "px";
+el.style.top = sq.offsetTop + "px";
 currentSquare = sq;
-letterEl.classList.add("locked"); // show lock indicator
 snapped = true;
 break;
 }
 }
+
 if (!snapped) {
-letterEl.classList.remove("locked");
 currentSquare = null;
+locked = false;
+el.classList.remove("locked");
 }
 });
 
-// Tap to toggle lock (only in square)
-letterEl.addEventListener("click", () => {
+/* === TAP TO LOCK (ONLY IN SQUARE) === */
+el.addEventListener("click", () => {
 if (!currentSquare) return;
-isLocked = !isLocked;
-if (isLocked) letterEl.classList.add("locked");
-else letterEl.classList.remove("locked");
+
+locked = !locked;
+el.classList.toggle("locked", locked);
 });
 }
 
-
+	

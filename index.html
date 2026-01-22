@@ -280,6 +280,7 @@ wordContainer.appendChild(box);
 container.appendChild(wordContainer);
 }
 });
+	document.getElementById('numbers').value = '';
 }
 
 function clearLetters() {
@@ -325,6 +326,7 @@ tile.addEventListener('touchstart', startDrag, { passive: false });
 
 canvas.appendChild(tile);
 });
+	document.getElementById('leters').value = '';
 }
 
 function startDrag(e) {
@@ -493,3 +495,4 @@ delete box.dataset.lastTap;
 </html>
 
 	
+

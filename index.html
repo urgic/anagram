@@ -99,6 +99,22 @@ button:active {
 background: #5568d3;
 }
 
+.btn-boxes {
+background: #f39c12;
+}
+
+.btn-boxes:active {
+background: #e67e22;
+}
+
+.btn-letters {
+background: #27ae60;
+}
+
+.btn-letters:active {
+background: #229954;
+}
+
 .word-boxes {
 min-height: 50px;
 padding: 10px;
@@ -214,7 +230,7 @@ pointer-events: none;
 <label for="numbers">Word Lengths:</label>
 <input type="text" id="numbers" placeholder="e.g., 3, 5, 4">
 </div>
-<button onclick="createWordBoxes()">Create Boxes</button>
+<button class="btn-boxes" onclick="createWordBoxes()">Create Boxes</button>
 </div>
 
 <div class="input-row">
@@ -222,7 +238,7 @@ pointer-events: none;
 <label for="letters">Letters:</label>
 <input type="text" id="letters" placeholder="e.g., ABCDEFGHIJKL">
 </div>
-<button onclick="createLetterTiles()">Create Tiles</button>
+<button class="btn-letters" onclick="createLetterTiles()">Create Tiles</button>
 </div>
 </div>
 
@@ -442,7 +458,7 @@ return;
 const now = Date.now();
 const lastTap = parseInt(box.dataset.lastTap || 0);
 
-if (now - lastTap < 350) {
+if (now - lastTap < 500) {
 box.classList.add('locked');
 delete box.dataset.lastTap;
 return;
@@ -470,7 +486,7 @@ box.classList.remove('vowel');
 delete box.dataset.tileId;
 delete box.dataset.lastTap;
 }
-}, 350);
+}, 500);
 }
 </script>
 </body>
